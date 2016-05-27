@@ -1,0 +1,7 @@
+#!/bin/python
+# -*- coding: utf-8 -*-
+from gtts import gTTS
+import time
+
+time = time.strftime("%I %M %p")
+tts = gTTS(text=time, lang='en')
