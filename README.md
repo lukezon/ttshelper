@@ -3,7 +3,8 @@ A simple voice activated assistant for specific commands
 
 ##install these things:
 ```
-sudo pip install gTTS
+pip install pyvona
+
 sudo apt-get install python-feedparser python-dnspython mpg123 festival
 
 sudo apt-get install libboost-regex1.49.0
