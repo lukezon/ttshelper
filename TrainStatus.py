@@ -73,50 +73,77 @@ class MTAStatus():
             self.subwayDict[s.getName()] = s
         return self.subwayDict
 
-#it won't work without this if statement, not sure why
-if 1 == 1:
-    #uses xml information to create service report
-    mtaStatus=MTAStatus()
-    timeMTA_ReportedData=mtaStatus.getReportTime()
-    
-    subwayDictionary=mtaStatus.getSubway()
-    for name in sorted(subwayDictionary.keys()):
-        #if orange line is good
-        if subwayDictionary[name].getName() == "BDFM" and subwayDictionary[name].getStatus() == "GOOD SERVICE":
-            #if orange line is good and blue line is good
-            if subwayDictionary[name].getName() == "ACE" and subwayDictionary[name].getStatus() == "GOOD SERVICE":
-                subwaystat = "Both the Blue and Orange lines have good service. "
-                print "1"
-            #if orange line is good but Blue is not good
-            if subwayDictionary[name].getName() == "ACE" and not subwayDictionary[name].getStatus() == "GOOD SERVICE":
-                subwaystat = "The Orange line has good service but the Blue line has %s." % (subwayDictionary[name].getStatus())
-                print "2"
-        #if Orange line is not good
-        if subwayDictionary[name].getName() == "BDFM" and not subwayDictionary[name].getStatus() == "GOOD SERVICE":
-            #if Orange line is not good and Blue is good
-            if subwayDictionary[name].getName() == "ACE" and subwayDictionary[name].getStatus() == "GOOD SERVICE":
-                subwaystat = "The blue line has good service but The Orange line has %s." % (subwayDictionary[name].getStatus())
-                print "3"
-            #if both the Orange and Blue lines are not good
-            else:
-                subwaystat = "There are problems with both the Blue and Orange lines."
-                print "4"
 
-                #This whole above section does not work because it cannot sort threw multiple subway lines at a time
+#uses xml information to create service report
+mtaStatus=MTAStatus()
+timeMTA_ReportedData=mtaStatus.getReportTime()
 
-    v = pyvona.create_voice('GDNAJW3FDVSMQKUCCFKQ','RoXbQ1VnTPU/dvmzhSwx43mjnXhBzlEeMc2qoNcu')
-    #Settings for ivona
-    v.voice_name = 'Brian'
-    v.speech_rate = 'slow'
-    #Get ogg file with speech
-    v.fetch_voice(subwaystat, '/mnt/ram/tempspeech.ogg')
+subwayDictionary=mtaStatus.getSubway()
+for name in sorted(subwayDictionary.keys()):
+    #creates report info for ACE line in varable ACEstat
+    if subwayDictionary[name].getName() == "ACE":
+        if subwayDictionary[name].getStatus() == "GOOD SERVICE":
+            ACEstat = "good"
+        else:
+            ACEstat = "%s" % (subwayDictionary[name].getStatus())
+    #creates report info for BDFM line in varable BDFMstat
+    if subwayDictionary[name].getName() == "BDFM":
+        if subwayDictionary[name].getStatus() == "GOOD SERVICE":
+            BDFMstat = "good"
+        else:
+            BDFMstat = "%s" % (subwayDictionary[name].getStatus())
+
+#print for debug
+print BDFMstat
+print ACEstat
+
+#fixes grammer for ACE and BDFM stats
+if ACEstat == "DELAYS":
+    ACEstat = "are delays"
+elif ACEstat == "SERVICE CHANGE":
+    ACEstat = "are service changes"
+
+if BDFMstat == "DELAYS":
+    BDFMstat = "are delays"
+elif BDFMstat == "SERVICE CHANGE":
+    BDFMstat = "are service changes"
+
+#print for debug
+print BDFMstat
+print ACEstat
 
 
-    pygame.mixer.init()
-    pygame.mixer.music.load("/mnt/ram/tempspeech.ogg")
-    pygame.mixer.music.play()
-    while pygame.mixer.music.get_busy() == True:
-        continue
+#combines ACE and BDFM info into logical sentence
+if ACEstat == "good" and BDFMstat == "good":
+    subwaystat = "There are no problems with the Blue or Orange lines."
+elif ACEstat == "good" and not BDFMstat == "good":
+    subwaystat = "The Blue line has no problems but there %s on the Orange line." % BDFMstat
+elif not ACEstat == "good" and BDFMstat == "good":
+    subwaystat = "The Orange line has no problems but there %s on the Blue line." % ACEstat
+elif not ACEstat == "good" and not BDFMstat == "good":
+    if ACEstat == BDFMstat:
+        subwaystat = "There %s on both the Blue and Orange lines." % ACEstat
+    else:
+        subwaystat = "There " + ACEstat + " on the Blue line and there " + BDFMstat + " the Orange line."
+else:
+    subwaystat = "There was an error reading the xml document."
 
+
+#creates the speech file
+v = pyvona.create_voice('GDNAJW3FDVSMQKUCCFKQ','RoXbQ1VnTPU/dvmzhSwx43mjnXhBzlEeMc2qoNcu')
+#Settings for ivona
+v.voice_name = 'Brian'
+v.speech_rate = 'slow'
+#Get ogg file with speech
+v.fetch_voice(subwaystat, '/mnt/ram/tempspeech.ogg')
+
+#plays the speech file
+pygame.mixer.init()
+pygame.mixer.music.load("/mnt/ram/tempspeech.ogg")
+pygame.mixer.music.play()
+while pygame.mixer.music.get_busy() == True:
+    continue
+
+#cleans up the speech file
 print 'cleaning up now'
 print subprocess.call ('rm /mnt/ram/*.ogg', shell=True)
