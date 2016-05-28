@@ -6,8 +6,16 @@ import pygame
 import subprocess
 
 #Creates Time variable
-time = "The Current Time is " + time.strftime("%I %M %p")
+time = time.strftime("%I %M %p")
+time = list(time)
 
+if time[0][0] == "0":
+	time.pop(0)
+	time = ''.join(time)
+else:
+	time = ''.join(time)
+
+time = "The Current Time is " + time
 v = pyvona.create_voice('GDNAJW3FDVSMQKUCCFKQ','RoXbQ1VnTPU/dvmzhSwx43mjnXhBzlEeMc2qoNcu')
 #Settings for ivona
 v.voice_name = 'Brian'
