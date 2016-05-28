@@ -1,11 +1,13 @@
 # ttshelper
-A simple voice activated assistant for specific commands
+Group of commands that can be run to give spoken information via Ivona TTS.
 
 ##install these things:
 ```
 pip install pyvona
 
+sudo apt-get install libxml2-dev libxslt-dev python-dev
 sudo apt-get install python-feedparser python-dnspython mpg123 festival
+sudo apt-get install python3-lxml
 
 sudo apt-get install libboost-regex1.49.0
 sudo apt-get install git-core
